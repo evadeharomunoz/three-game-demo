@@ -1,8 +1,13 @@
+import { BoxGeometry, MeshNormalMaterial } from 'three'
+
 type CubeGridProps = {
   size: number
   spacing: number
   levelsMap: number[][]
 }
+
+const cube = new BoxGeometry(1,1,1)
+const material = new MeshNormalMaterial()
 
 function CubeGrid({ size, spacing, levelsMap }: CubeGridProps) {
   const cubes = []
@@ -17,10 +22,9 @@ function CubeGrid({ size, spacing, levelsMap }: CubeGridProps) {
             <mesh
               key={`${x}-${y}-${z}`}
               position={[x * spacing, y * spacing, z * spacing]}
-            >
-              <boxGeometry args={[1, 1, 1]} />
-              <meshNormalMaterial />
-            </mesh>
+              geometry={cube}
+              material={material}
+            />
           )
         }
       }
