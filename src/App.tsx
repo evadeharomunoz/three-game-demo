@@ -1,96 +1,63 @@
-import * as THREE from 'three'
+import { TilesNumbers } from './components/types/types'
 import { OrbitControls } from '@react-three/drei'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { ReactNode, useRef } from 'react'
-import GenerateGrid from './components/GenerateGrid'
-import CubeGrid from './components/CubeGrid'
+import { Canvas } from '@react-three/fiber'
 
-type CameraMovementProps = {
-  children: ReactNode
-}
-
-function CameraMovement({ children }: CameraMovementProps) {
-  const { pointer } = useThree()
-  const cam = useRef<THREE.Group>(null)
-
-  useFrame(() => {
-    if (cam.current) {
-      const targetX = pointer.x * 2
-      const targetY = pointer.y * 2
-
-      cam.current.position.x += (targetX - cam.current.position.x) * 0.05
-      cam.current.position.y += (targetY - cam.current.position.y) * 0.05
-    }
-  })
-
-  return <group ref={cam}>{children}</group>
-}
+import getTileInformation from './utils/getTileInformation'
+import CameraMovement from './components/CameraMovement'
+import BaseGenerator from './components/BaseGenerator'
 
 function App() {
-  const SIZE_NUMBER = 40
-  const SIZE_HEIGHT = 20
-
-  function generateLevelsMap() {
-    const rows = SIZE_NUMBER
-    const cols = SIZE_NUMBER
-    const levelsMap = Array.from({ length: rows }, (_, rowIndex) => {
-      if (rowIndex < 1) {
-        return [...Array(cols).fill(SIZE_HEIGHT)]
-      } else if (rowIndex < 8) {
-        return [
-          ...Array(1).fill(SIZE_HEIGHT),
-          ...Array(20).fill(2),
-          ...Array(9).fill(0),
-          ...Array(10).fill(2),
-        ]
-      } else if (rowIndex < 24) {
-        return [...Array(1).fill(SIZE_HEIGHT), ...Array(39).fill(2)]
-      } else if (rowIndex < 35) {
-        return [
-          ...Array(1).fill(SIZE_HEIGHT),
-          ...Array(17).fill(5),
-          ...Array(22).fill(1),
-        ]
-      } else if (rowIndex <= 40) {
-        return [
-          ...Array(1).fill(SIZE_HEIGHT),
-          ...Array(13).fill(5),
-          ...Array(2).fill(4),
-          ...Array(2).fill(3),
-          ...Array(2).fill(2),
-          ...Array(23).fill(1),
-        ]
-      } else {
-        return Array(cols).fill(1)
-      }
-    })
-
-    return levelsMap
-  }
-
-  const levelsMap = generateLevelsMap()
+  const tiles = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 4, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 4, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 5, 5, 1, 1, 1, 1, 1, 4, 3, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 5, 5, 1, 1, 1, 3, 3, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 5, 5, 1, 1, 3, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 1, 1, 5, 5, 5, 1, 1, 3, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 5, 4, 1, 1],
+    [0, 1, 1, 1, 4, 5, 1, 1, 1, 3, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1],
+    [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 5, 5, 1, 1, 1, 1, 5, 1, 1, 0],
+    [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 5, 5, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 5, 5, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ] as TilesNumbers[][]
 
   return (
     <div className='h-full'>
-      {location.href.includes('generate') ? (
-        <GenerateGrid />
-      ) : (
-        <Canvas camera={{ fov: 60, position: [0, 0, 20] }}>
-          <OrbitControls />
-          <CameraMovement>
-            <mesh>
-              <CubeGrid
-                size={SIZE_NUMBER}
-                spacing={1.05}
-                levelsMap={levelsMap}
-              />
-              <meshNormalMaterial />
-            </mesh>
-          </CameraMovement>
-          <ambientLight intensity={2} />
-          <pointLight position={[10, 10, 10]} />
-        </Canvas>
-      )}
+      <Canvas camera={{ fov: 60, position: [0, 0, 20] }}>
+        <OrbitControls />
+        <CameraMovement>
+          {tiles.map((row, x) =>
+            row.map(
+              (tile, z) =>
+                tile !== 0 && (
+                  <BaseGenerator
+                    key={`${x}-${z}`}
+                    x={x}
+                    y={0}
+                    z={z}
+                    type={getTileInformation(tile).type}
+                    references={'event_01'}
+                  />
+                )
+            )
+          )}
+        </CameraMovement>
+        <ambientLight intensity={2} />
+        <pointLight position={[10, 10, 10]} />
+      </Canvas>
     </div>
   )
 }
