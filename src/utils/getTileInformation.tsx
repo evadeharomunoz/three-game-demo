@@ -2,7 +2,7 @@ import {
   TileInformation,
   TilesNumbers,
   TileType,
-} from '../components/types/types';
+} from '../types/types';
 import {
   constructionMaterial,
   eventMaterial,
