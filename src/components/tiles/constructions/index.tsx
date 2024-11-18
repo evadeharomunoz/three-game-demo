@@ -1,11 +1,13 @@
-import { BaseTileProps } from '../../../lib/types'
+import { BaseTileProps } from '../../../types/types'
 import CloseWater from '../CloseWater'
 import Construction from '../Construction'
 import Event from '../Event'
 import Tile from '../Tile'
 import Void from '../Void'
 import Water from '../Water'
+
 type SharedProps = BaseTileProps & { key: string }
+
 const constructions = {
 	water: ({ key, ...props }: SharedProps) => <Water key={key} {...props} />,
 	closeWater: ({ key, ...props }: SharedProps) => <CloseWater key={key} {...props} />,

@@ -1,4 +1,4 @@
-import { BaseTileProps } from '../../lib/types'
+import { BaseTileProps } from '../../types/types'
 import { eventMaterial, square } from './shared'
 
 export default function Event({ ...p }: BaseTileProps) {

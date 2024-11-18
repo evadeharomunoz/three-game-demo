@@ -1,19 +1,22 @@
-import { BoxGeometry, Color, MeshBasicMaterial, SphereGeometry } from 'three'
+import { BoxGeometry, Color, MeshBasicMaterial, MeshNormalMaterial, SphereGeometry } from 'three'
 
 export const spacing = 1.05
 const color = new Color()
+
 // Shapes
 export const xSize = 5
 export const zSize = xSize
 export const square = new BoxGeometry(xSize, 1, zSize)
 export const circle = new SphereGeometry(1, 32)
+
 // Materials
 const baseMaterial = new MeshBasicMaterial({ color: 0x00ff00 })
 export const voidMaterial = baseMaterial.clone()
 voidMaterial.color = color.clone().setHex(0xffffff)
+voidMaterial.transparent = true;
+voidMaterial.opacity = 0; 
 
-export const simple_tileMaterial = baseMaterial.clone()
-simple_tileMaterial.color = color.clone().setHex(0x000000)
+export const simple_tileMaterial = new MeshNormalMaterial();
 
 export const eventMaterial = baseMaterial.clone()
 eventMaterial.color = color.clone().setHex(0xffa500)

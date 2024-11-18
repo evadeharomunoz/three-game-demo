@@ -1,4 +1,4 @@
-import { BaseTileProps } from '../../lib/types'
+import { BaseTileProps } from '../../types/types'
 import { square, voidMaterial } from './shared'
 
 export default function Void({ ...p }: BaseTileProps) {

@@ -1,15 +1,14 @@
 import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import BaseGenerator from './components/BaseGenerator';
-import { useEffect, useMemo, useState } from 'react';
-import getMap from './lib/map';
-import User from './components/tiles/User';
+import { useEffect, useState } from 'react';
 
 import validateMovement from './lib/utils/validateMovement';
-import BigRectangle from './components/tiles/constructions/BigRectangle';
+import BaseGenerator from './components/BaseGenerator';
+import User from './components/tiles/User';
+import getMap from './lib/map';
 
 function App() {
-  const tiles = useMemo(() => getMap(), []);
+  const [map, setMap] = useState(getMap());
   const [position, setPosition] = useState([13, 2, 0] satisfies [
     number,
     number,
@@ -42,6 +41,7 @@ function App() {
     window.addEventListener('keydown', handleMovement);
     return () => window.removeEventListener('keydown', handleMovement);
   }, []);
+
   return (
     <div className='h-full'>
       <Canvas
@@ -56,15 +56,10 @@ function App() {
         }}
       >
         <OrbitControls />
-        <BaseGenerator tiles={tiles} />
+
         <User position={position} />
-        {/* <Water position={[0, 0, 0]} />
-						<CloseWater position={[6, 0, 6]} />
-						<Construction position={[6, 0, 0]} />
-						<Tile position={[0, 0, 6]} />
-						<Event position={[12, 0, 0]} />
-						<Void position={[12, 0, 6]} /> */}
-        <BigRectangle />
+        <BaseGenerator tiles={map} map={map} setMap={setMap} />
+
         <ambientLight intensity={2} />
         <pointLight position={[10, 10, 10]} />
       </Canvas>

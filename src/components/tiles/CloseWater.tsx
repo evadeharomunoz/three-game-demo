@@ -1,4 +1,4 @@
-import { BaseTileProps } from '../../lib/types'
+import { BaseTileProps } from '../../types/types'
 import { close_waterMaterial, square } from './shared'
 
 export default function CloseWater({ ...p }: BaseTileProps) {
