@@ -1,4 +1,4 @@
-import { TileInformation } from './types/types';
+import { TileInformation } from '../types/types';
 import { BoxGeometry } from 'three';
 
 import getTileInformation from '../utils/getTileInformation';
