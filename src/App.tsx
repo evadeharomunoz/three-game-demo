@@ -1,63 +1,65 @@
-import { TilesNumbers } from './types/types';
-import { CameraControls, OrbitControls } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei'
+import { Canvas } from '@react-three/fiber'
+import BaseGenerator from './components/BaseGenerator'
+import { useEffect, useMemo, useState } from 'react'
+import getMap from './lib/map'
+import User from './components/tiles/User'
 
-import getTileInformation from './utils/getTileInformation';
-import BaseGenerator from './components/BaseGenerator';
+import validateMovement from './lib/utils/validateMovement'
+import BigRectangle from './components/tiles/constructions/BigRectangle'
 
 function App() {
-  const tiles = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 5, 5, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 5, 5, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 5, 5, 1, 1, 1, 1, 5, 1, 1, 0],
-    [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1],
-    [0, 1, 1, 1, 4, 5, 1, 1, 1, 3, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1],
-    [0, 1, 1, 5, 5, 5, 1, 1, 3, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 5, 4, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 5, 5, 1, 1, 3, 2, 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 5, 5, 1, 1, 1, 3, 3, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 1, 1, 5, 5, 1, 1, 1, 1, 1, 4, 3, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 4, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 4, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  ] as TilesNumbers[][];
-
-  return (
-    <div className='h-full'>
-      <Canvas camera={{ fov: 60, position: [0, 0, 20] }}>
-        <OrbitControls />
-        <CameraControls makeDefault />
-        {tiles.map((row, x) =>
-          row.map(
-            (tile, z) =>
-              tile !== 0 && (
-                <BaseGenerator
-                  key={`${x}-${z}`}
-                  x={x}
-                  y={0}
-                  z={z}
-                  type={getTileInformation(tile).type}
-                  references={'event_01'}
-                />
-              )
-          )
-        )}
-        <ambientLight intensity={2} />
-        <pointLight position={[10, 10, 10]} />
-      </Canvas>
-    </div>
-  );
+	const tiles = useMemo(() => getMap(), [])
+	const [position, setPosition] = useState([13, 2, 0] satisfies [number, number, number])
+	function handleMovement(e: KeyboardEvent) {
+		switch (e.key) {
+			case 'd':
+				setPosition(([x, , z]) => {
+					return validateMovement([x, 0, z], [x + 1, 0, z])
+				})
+				return
+			case 'w':
+				setPosition(([x, , z]) => {
+					return validateMovement([x, 0, z], [x, 0, z - 1])
+				})
+				return
+			case 'a':
+				setPosition(([x, , z]) => {
+					return validateMovement([x, 0, z], [x - 1, 0, z])
+				})
+				return
+			case 's':
+				setPosition(([x, , z]) => {
+					return validateMovement([x, 0, z], [x, 0, z + 1])
+				})
+		}
+	}
+	useEffect(() => {
+		window.addEventListener('keydown', handleMovement)
+		return () => window.removeEventListener('keydown', handleMovement)
+	}, [])
+	return (
+		<div className='h-full'>
+			<Canvas camera={{ fov: 60, position: [-38.45243352252325, 97.74725408686916, -30.143349919091854], rotation: [-2.1918054491040944, -0.6082134779972862, -2.467657308228318] }}>
+				<OrbitControls />
+				{/* <CameraMovement> */}
+				<>
+					<BaseGenerator tiles={tiles} />
+					<User position={position} />
+					{/* <Water position={[0, 0, 0]} />
+						<CloseWater position={[6, 0, 6]} />
+						<Construction position={[6, 0, 0]} />
+						<Tile position={[0, 0, 6]} />
+						<Event position={[12, 0, 0]} />
+						<Void position={[12, 0, 6]} /> */}
+					<BigRectangle />
+				</>
+				{/* </CameraMovement> */}
+				<ambientLight intensity={2} />
+				<pointLight position={[10, 10, 10]} />
+			</Canvas>
+		</div>
+	)
 }
 
 export default App;
